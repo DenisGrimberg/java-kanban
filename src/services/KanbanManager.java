@@ -11,9 +11,9 @@ import java.util.HashMap;
 public class KanbanManager {
 
     private static int id = 0;
-    private HashMap<Integer, Task> tasks;
-    private HashMap<Integer, SubTask> subTasks;
-    private HashMap<Integer, Epic> epics;
+    private final HashMap<Integer, Task> tasks;
+    private final HashMap<Integer, SubTask> subTasks;
+    private final HashMap<Integer, Epic> epics;
 
     public KanbanManager() {
         tasks = new HashMap<>();
@@ -21,7 +21,7 @@ public class KanbanManager {
         epics = new HashMap<>();
     }
 
-    public static int generateId() {
+    private static int generateId() {
         return ++id;
     }
 
@@ -37,7 +37,7 @@ public class KanbanManager {
     }
 
     public Task getTaskById(int id) {
-        return tasks.getOrDefault(id, null);
+        return tasks.get(id);
     }
 
     public ArrayList<Task> getAllTasks() {
@@ -61,9 +61,14 @@ public class KanbanManager {
     }
 
     public void updateEpic(Epic epic) {
-        if (epics.containsKey(epic.getId())) {
-            epics.put(epic.getId(), epic);
-            checkEpicStatus(epic.getId());
+        int idUpdatedEpic = epic.getId();
+
+        if (epics.containsKey(idUpdatedEpic)) {
+            Epic newEpic = new Epic(idUpdatedEpic, epic.getName(), epic.getDescription(),
+                    epic.getStatus(), epic.getEpicSubTasks());
+
+            epics.put(idUpdatedEpic, newEpic);
+            checkEpicStatus(idUpdatedEpic);
         }
     }
 
@@ -82,7 +87,6 @@ public class KanbanManager {
             for (Integer subtaskId : epic.getEpicSubTasks()) {
                 subTasks.remove(subtaskId);
             }
-            epic.setEpicSubTasks(new ArrayList<>());
         }
     }
 
@@ -94,9 +98,12 @@ public class KanbanManager {
     public void addSubTask(SubTask subtask) {
         subtask.setId(generateId());
         subtask.setStatus(TaskStatus.NEW);
+        int epicId = subtask.getEpicId();
         subTasks.put(subtask.getId(), subtask);
-        epics.get(subtask.getEpicId()).getEpicSubTasks().add(subtask.getId());
-        checkEpicStatus(subtask.getEpicId());
+        if (epics.containsKey(epicId)) {
+            epics.get(epicId).getEpicSubTasks().add(subtask.getId());
+            checkEpicStatus(epicId);
+        }
     }
 
     public void updateSubTask(SubTask subtask) {
@@ -117,8 +124,7 @@ public class KanbanManager {
     public void deleteSubTaskById(int id) {
         if (subTasks.containsKey(id)) {
             int epicId = subTasks.get(id).getEpicId();
-            int epicSubTaskId = epics.get(epicId).getEpicSubTasks().indexOf(id);
-            epics.get(epicId).getEpicSubTasks().remove(epicSubTaskId);
+            epics.get(epicId).deleteIdOfSubTask(id);
             subTasks.remove(id);
             checkEpicStatus(epicId);
 
@@ -128,14 +134,16 @@ public class KanbanManager {
     public void deleteAllSubTask() {
         subTasks.clear();
         for (Epic epic : epics.values()) {
-            epic.setStatus(TaskStatus.NEW);
-            epic.setEpicSubTasks(new ArrayList<>());
+            checkEpicStatus(epic.getId());
+            epic.getEpicSubTasks().clear();
         }
     }
 
     private void checkEpicStatus(int epicId) {
 
-        if (epics.get(epicId).getEpicSubTasks().size() == 0) {
+        Epic epic = epics.get(epicId);
+
+        if (epic.getEpicSubTasks().isEmpty()) {
             epics.get(epicId).setStatus(TaskStatus.NEW);
             return;
         }
@@ -143,7 +151,7 @@ public class KanbanManager {
         boolean allTaskIsNew = true;
         boolean allTaskIsDone = true;
 
-        for (Integer epicSubtaskId : epics.get(epicId).getEpicSubTasks()) {
+        for (Integer epicSubtaskId : epic.getEpicSubTasks()) {
             TaskStatus status = subTasks.get(epicSubtaskId).getStatus();
             if (!status.equals(TaskStatus.NEW)) {
                 allTaskIsNew = false;
@@ -154,11 +162,11 @@ public class KanbanManager {
         }
 
         if (allTaskIsDone) {
-            epics.get(epicId).setStatus(TaskStatus.DONE);
+            epic.setStatus(TaskStatus.DONE);
         } else if (allTaskIsNew) {
-            epics.get(epicId).setStatus(TaskStatus.NEW);
+            epic.setStatus(TaskStatus.NEW);
         } else {
-            epics.get(epicId).setStatus(TaskStatus.IN_PROGRESS);
+            epic.setStatus(TaskStatus.IN_PROGRESS);
         }
     }
 }
