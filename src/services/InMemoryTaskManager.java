@@ -7,59 +7,67 @@ import entity.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class KanbanManager {
-
+public class InMemoryTaskManager implements TaskManager {
     private static int id = 0;
     private final HashMap<Integer, Task> tasks;
     private final HashMap<Integer, SubTask> subTasks;
     private final HashMap<Integer, Epic> epics;
+    private final HistoryManager inMemoryHistoryManager = Managers.getDefaultHistory();
 
-    public KanbanManager() {
+    public InMemoryTaskManager() {
         tasks = new HashMap<>();
         subTasks = new HashMap<>();
         epics = new HashMap<>();
     }
 
-    private static int generateId() {
+    public int generateId() {
         return ++id;
     }
 
+    @Override
     public void addTask(Task task) {
         task.setId(generateId());
         tasks.put(task.getId(), task);
     }
 
+    @Override
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
         }
     }
 
+    @Override
     public Task getTaskById(int id) {
+        inMemoryHistoryManager.add(tasks.get(id));
         return tasks.get(id);
     }
 
+    @Override
     public ArrayList<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
     }
 
+    @Override
     public void deleteTaskById(int id) {
-        if (tasks.containsKey(id)) {
-            tasks.remove(id);
-        }
+        tasks.remove(id);
     }
 
+    @Override
     public void deleteAllTasks() {
         tasks.clear();
     }
 
+    @Override
     public void addEpic(Epic epic) {
         epic.setId(generateId());
         epic.setStatus(TaskStatus.NEW);
         epics.put(epic.getId(), epic);
     }
 
+    @Override
     public void updateEpic(Epic epic) {
         int idUpdatedEpic = epic.getId();
 
@@ -72,14 +80,18 @@ public class KanbanManager {
         }
     }
 
+    @Override
     public Epic getEpicById(int id) {
-        return epics.getOrDefault(id, null);
+        inMemoryHistoryManager.add(epics.get(id));
+        return epics.get(id);
     }
 
+    @Override
     public ArrayList<Epic> getAllEpics() {
         return new ArrayList<>(epics.values());
     }
 
+    @Override
     public void deleteEpicById(int id) {
         if (epics.containsKey(id)) {
             Epic epic = epics.get(id);
@@ -90,11 +102,13 @@ public class KanbanManager {
         }
     }
 
+    @Override
     public void deleteAllEpics() {
         epics.clear();
         subTasks.clear();
     }
 
+    @Override
     public void addSubTask(SubTask subtask) {
         subtask.setId(generateId());
         subtask.setStatus(TaskStatus.NEW);
@@ -106,6 +120,7 @@ public class KanbanManager {
         }
     }
 
+    @Override
     public void updateSubTask(SubTask subtask) {
         if (subTasks.containsKey(subtask.getId())) {
             subTasks.put(subtask.getId(), subtask);
@@ -113,14 +128,18 @@ public class KanbanManager {
         }
     }
 
+    @Override
     public SubTask getSubTaskById(int id) {
-        return subTasks.getOrDefault(id, null);
+        inMemoryHistoryManager.add(subTasks.get(id));
+        return subTasks.get(id);
     }
 
+    @Override
     public ArrayList<SubTask> getAllSubTasks() {
         return new ArrayList<>(subTasks.values());
     }
 
+    @Override
     public void deleteSubTaskById(int id) {
         if (subTasks.containsKey(id)) {
             int epicId = subTasks.get(id).getEpicId();
@@ -131,6 +150,7 @@ public class KanbanManager {
         }
     }
 
+    @Override
     public void deleteAllSubTask() {
         subTasks.clear();
         for (Epic epic : epics.values()) {
@@ -139,7 +159,8 @@ public class KanbanManager {
         }
     }
 
-    private void checkEpicStatus(int epicId) {
+    @Override
+    public void checkEpicStatus(int epicId) {
 
         Epic epic = epics.get(epicId);
 
@@ -168,5 +189,10 @@ public class KanbanManager {
         } else {
             epic.setStatus(TaskStatus.IN_PROGRESS);
         }
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return inMemoryHistoryManager.getHistory();
     }
 }
