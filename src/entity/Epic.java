@@ -22,11 +22,8 @@ public class Epic extends Task {
         return epicSubTasks;
     }
 
-    public void deleteIdOfSubTask(int id) {
-        if (epicSubTasks.contains(id)) {
-            int epicSubTaskId = epicSubTasks.indexOf(id);
-            epicSubTasks.remove(epicSubTaskId);
-        }
+    public void deleteIdOfSubTask(Integer id) {
+        epicSubTasks.remove(id);
 
     }
 

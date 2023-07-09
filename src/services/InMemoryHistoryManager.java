@@ -30,7 +30,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-        int taskId = task.getId();
+        final int taskId = task.getId();
         remove(taskId);
         linkLast(task);
         customLinkedList.put(taskId, last);
@@ -44,7 +44,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    public List<Task> getTasks() {
+    private List<Task> getTasks() {
         List<Task> historyList = new ArrayList<>();
         Node node = first;
         while (node != null) {
