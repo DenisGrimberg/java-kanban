@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static int id = 0;
-    private final HashMap<Integer, Task> tasks;
-    private final HashMap<Integer, SubTask> subTasks;
-    private final HashMap<Integer, Epic> epics;
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected static int id = 0;
+    protected final HashMap<Integer, Task> tasks;
+    protected final HashMap<Integer, SubTask> subTasks;
+    protected final HashMap<Integer, Epic> epics;
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
@@ -81,7 +81,7 @@ public class InMemoryTaskManager implements TaskManager {
         int idUpdatedEpic = epic.getId();
 
         if (epics.containsKey(idUpdatedEpic)) {
-            Epic newEpic = new Epic(idUpdatedEpic, epic.getName(), epic.getDescription(),
+            Epic newEpic = new Epic(idUpdatedEpic, epic.getName(), epic.getTaskType(), epic.getDescription(),
                     epic.getStatus(), epic.getEpicSubTasks());
 
             epics.put(idUpdatedEpic, newEpic);

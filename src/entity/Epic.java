@@ -1,24 +1,26 @@
 package entity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
 
-    private final ArrayList<Integer> epicSubTasks;
+    private final List<Integer> epicSubTasks;
 
-    public Epic(String name, String description) {
-        super(name, description);
+    public Epic(String name, TaskType taskType, String description) {
+        super(name, taskType, description);
         this.epicSubTasks = new ArrayList<>();
+
     }
 
-    public Epic(int id, String name, String description, TaskStatus status, ArrayList<Integer> epicSubTasks) {
-        super(name, description);
+    public Epic(int id, String name, TaskType taskType, String description, TaskStatus status, List<Integer> epicSubTasks) {
+        super(name, taskType, description);
         this.id = id;
         this.status = status;
         this.epicSubTasks = epicSubTasks;
     }
 
-    public ArrayList<Integer> getEpicSubTasks() {
+    public List<Integer> getEpicSubTasks() {
         return epicSubTasks;
     }
 
@@ -36,5 +38,10 @@ public class Epic extends Task {
                 ", status='" + status + '\'' +
                 ", epicSubTasks='" + epicSubTasks + '\'' +
                 '}';
+    }
+
+    @Override
+    public String taskToString() {
+        return getId() + "," + TaskType.EPIC + "," + getName() + "," + getStatus() + "," + getDescription();
     }
 }

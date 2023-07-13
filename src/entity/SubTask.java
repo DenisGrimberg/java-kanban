@@ -3,8 +3,8 @@ package entity;
 public class SubTask extends Task {
     private int epicId;
 
-    public SubTask(String title, String description, int epicId) {
-        super(title, description);
+    public SubTask(String name, TaskType taskType, String description, int epicId) {
+        super(name, taskType, description);
         this.epicId = epicId;
     }
 
@@ -25,5 +25,11 @@ public class SubTask extends Task {
                 ", status='" + status + '\'' +
                 ", epicId=" + epicId +
                 '}';
+    }
+
+    @Override
+    public String taskToString() {
+        return getId() + "," + TaskType.SUBTASK  + "," + getName()  + "," + getStatus() + ","
+                + getDescription()  + "," + getEpicId();
     }
 }
