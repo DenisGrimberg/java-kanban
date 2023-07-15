@@ -17,6 +17,11 @@ public class SubTask extends Task {
     }
 
     @Override
+    public TaskType getTaskType() {
+        return TaskType.SUBTASK;
+    }
+
+    @Override
     public String toString() {
         return "SubTask{" +
                 "id=" + id +
@@ -25,11 +30,5 @@ public class SubTask extends Task {
                 ", status='" + status + '\'' +
                 ", epicId=" + epicId +
                 '}';
-    }
-
-    @Override
-    public String taskToString() {
-        return getId() + "," + TaskType.SUBTASK  + "," + getName()  + "," + getStatus() + ","
-                + getDescription()  + "," + getEpicId();
     }
 }

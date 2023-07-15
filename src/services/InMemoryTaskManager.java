@@ -22,7 +22,7 @@ public class InMemoryTaskManager implements TaskManager {
         epics = new HashMap<>();
     }
 
-    public int generateId() {
+    private int generateId() {
         return ++id;
     }
 

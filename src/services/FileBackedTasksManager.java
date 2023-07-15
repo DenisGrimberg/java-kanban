@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTasksManager extends InMemoryTaskManager {
     public static final String HEADER_STR = "id,type,name,status,description,epic";
     private final File file;
 
@@ -24,78 +24,24 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
             bufferedWriter.write(HEADER_STR + "\n");
             for (Task task : getAllTasks()) {
-                bufferedWriter.write(taskToString(task) + "\n");
+                bufferedWriter.write(CSVTaskFormatter.toString(task) + "\n");
             }
 
             for (Epic epic : getAllEpics()) {
-                bufferedWriter.write(taskToString(epic) + "\n");
+                bufferedWriter.write(CSVTaskFormatter.toString(epic) + "\n");
             }
 
             for (SubTask subTask : getAllSubTasks()) {
-                bufferedWriter.write(taskToString(subTask) + "\n");
+                bufferedWriter.write(CSVTaskFormatter.toString(subTask) + "," + subTask.getEpicId() + "\n");
             }
 
-            bufferedWriter.write("\n" + toStringManager(getHistory()));
+            bufferedWriter.write("\n" + CSVTaskFormatter.historyToString(historyManager));
         } catch (IOException exception) {
             throw new ManagerSaveException(exception.getMessage(), exception.getCause());
         }
     }
 
-    private String taskToString(Task task) {
-        return task.taskToString();
-    }
-
-    private static Task taskFromString(String value) {
-        String[] arrayTask = value.split(",");
-        int taskId = Integer.parseInt(arrayTask[0]);
-        TaskType taskType = TaskType.valueOf(arrayTask[1]);
-        String taskName = arrayTask[2];
-        TaskStatus taskStatus = TaskStatus.valueOf(arrayTask[3]);
-        String taskDescription = arrayTask[4];
-        Task task = null;
-
-        switch (taskType) {
-            case TASK:
-                task = new Task(taskName, taskType, taskDescription);
-                task.setStatus(taskStatus);
-                break;
-            case EPIC:
-                task = new Epic(taskName, taskType, taskDescription);
-                task.setStatus(taskStatus);
-                break;
-            case SUBTASK:
-                task = new SubTask(taskName, taskType, taskDescription, Integer.parseInt(arrayTask[5]));
-                task.setStatus(taskStatus);
-                break;
-        }
-        task.setId(taskId);
-        return task;
-    }
-
-    private static String toStringManager(List<Task> taskList) {
-        String lastLine;
-        List<String> newList = new ArrayList<>();
-
-        for (Task task : taskList) {
-            newList.add(String.valueOf(task.getId()));
-        }
-
-        lastLine = String.join(",", newList);
-
-        return lastLine;
-    }
-
-    private static List<Integer> fromStringManager(String value) {
-        List<Integer> newList = new ArrayList<>();
-        String[] line = value.split(",");
-
-        for (String str : line) {
-            newList.add(Integer.parseInt(str));
-        }
-        return newList;
-    }
-
-    private static FileBackedTasksManager loadFromFile(File file) {
+    public static FileBackedTasksManager loadFromFile(File file) {
         FileBackedTasksManager manager = new FileBackedTasksManager(file);
 
         List<String> stringList;
@@ -112,7 +58,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                     break;
                 }
 
-                Task task = taskFromString(stringList.get(i));
+                Task task = CSVTaskFormatter.fromString(stringList.get(i));
                 taskMap.put(task.getId(), task);
 
                 if (task.getTaskType() == TaskType.TASK) {
@@ -141,7 +87,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
             if (stringList.size() > 1) {
                 String history = stringList.get(stringList.size() - 1);
-                List<Integer> list = fromStringManager(history);
+                List<Integer> list = CSVTaskFormatter.historyFromString(history);
 
                 for (Integer id : list) {
                     manager.historyManager.add(taskMap.get(id));

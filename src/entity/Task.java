@@ -49,7 +49,7 @@ public class Task {
     }
 
     public TaskType getTaskType() {
-        return taskType;
+        return TaskType.TASK;
     }
 
     @Override
@@ -60,9 +60,5 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
                 '}';
-    }
-
-    public String taskToString() {
-        return getId() + "," + getTaskType() + "," + getName() + "," + getStatus() + "," + getDescription();
     }
 }
