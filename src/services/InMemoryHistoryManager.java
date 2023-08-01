@@ -2,24 +2,33 @@ package services;
 
 import entity.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final Map<Integer, Node> customLinkedList = new HashMap<>();
+    private final Map<Integer, Node> browsingHistoryTasks = new HashMap<>();
+    private Node head;
+    private Node tail;
 
-    private Node first;
-    private Node last;
+    @Override
+    public void add(Task task) {
+        if (browsingHistoryTasks.containsKey(task.getId())) {
+            Node deletedNode = browsingHistoryTasks.get(task.getId());
+            deleteNode(deletedNode);
+            browsingHistoryTasks.remove(task.getId());
+        }
+        browsingHistoryTasks.put(task.getId(), linkLast(task));
+    }
 
-    private static class Node {
-        Task element;
-        Node next;
-        Node previous;
-
-        Node(Node previous, Task element, Node next) {
-            this.element = element;
-            this.next = next;
-            this.previous = previous;
+    @Override
+    public void delete(int id) {
+        if (browsingHistoryTasks.containsKey(id)) {
+            Node deletedNode = browsingHistoryTasks.get(id);
+            deleteNode(deletedNode);
+            browsingHistoryTasks.remove(id);
         }
     }
 
@@ -28,55 +37,56 @@ public class InMemoryHistoryManager implements HistoryManager {
         return getTasks();
     }
 
-    @Override
-    public void add(Task task) {
-        final int taskId = task.getId();
-        remove(taskId);
-        linkLast(task);
-        customLinkedList.put(taskId, last);
+    private Node linkLast(Task task) {
+        Node oldTail;
+        if (browsingHistoryTasks.size() == 0) {
+            oldTail = null;
+        } else {
+            oldTail = tail;
+        }
+        Node newTail = new Node(oldTail, task, null);
+        tail = newTail;
+        if (oldTail == null) {
+            head = newTail;
+        } else {
+            oldTail.setNext(newTail);
+        }
+        return newTail;
     }
 
-    @Override
-    public void remove(int id) {
-        if (customLinkedList.containsKey(id)) {
-            removeNode(customLinkedList.get(id));
-            customLinkedList.remove(id);
+    private void deleteNode(Node node) {
+        if (head == node) {
+            head = head.getNext();
+            if (head != null) {
+                head.setPrev(null);
+            }
+        } else if (tail == node) {
+            tail = tail.getPrev();
+            tail.setNext(null);
+        } else {
+            node.getPrev().setNext(node.getNext());
+            node.getNext().setPrev(node.getPrev());
         }
     }
 
     private List<Task> getTasks() {
-        List<Task> historyList = new ArrayList<>();
-        Node node = first;
-        while (node != null) {
-            historyList.add(node.element);
-            node = node.next;
+        List<Task> tasks = new ArrayList<>();
+        if (head != null) {
+            Node currentNode = head;
+            while (currentNode.getNext() != null) {
+                tasks.add(currentNode.getData());
+                currentNode = currentNode.getNext();
+            }
+            tasks.add(currentNode.getData());
         }
-        return historyList;
+        return tasks;
     }
 
-    private void linkLast(Task task) {
-        final Node oldTail = last;
-        final Node newNode = new Node(oldTail, task, null);
-        last = newNode;
-        if (oldTail == null) {
-            first = newNode;
-        } else {
-            oldTail.next = newNode;
-        }
-    }
-
-    private void removeNode(Node node) {
-        Node nextNext = node.next;
-        Node previousPrev = node.previous;
-        if (previousPrev == null) {
-            first = nextNext;
-        } else  {
-            previousPrev.next = nextNext;
-        }
-        if (nextNext == null) {
-            last = previousPrev;
-        } else {
-            nextNext.previous = previousPrev;
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InMemoryHistoryManager that = (InMemoryHistoryManager) o;
+        return getHistory().equals(that.getHistory());
     }
 }
