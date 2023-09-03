@@ -1,36 +1,45 @@
 package services;
 
 import entity.Epic;
-import entity.SubTask;
+import entity.Subtask;
 import entity.Task;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
 
-    void addTask(Task task);
+    void saveTask(Task task);
+    void saveEpic(Epic epic);
+    void saveSubtask(Subtask subtask);
+
+    ArrayList<Task> getTasksList();
+    ArrayList<Epic> getEpicsList();
+    ArrayList<Subtask> getSubtaskList();
+
+    void deleteTasks();
+    void deleteEpics();
+    void deleteSubtasks();
+
+    Task getTaskByIdNumber(int idNumber);
+    Epic getEpicTaskByIdNumber(int idNumber);
+    Subtask getSubTaskByIdNumber(int idNumber);
+
     void updateTask(Task task);
-    Task getTaskById(int id);
-    List<Task> getAllTasks();
-    void deleteTaskById(int id);
-    void deleteAllTasks();
-
-    void addEpic(Epic epic);
     void updateEpic(Epic epic);
-    Epic getEpicById(int id);
-    List<Epic> getAllEpics();
-    void deleteEpicById(int id);
-    void deleteAllEpics();
-    List<Integer> getSubTasksOfEpic(Epic epic);
+    void updateSubtask(Subtask subtask);
 
-    void addSubTask(SubTask subTask);
-    void updateSubTask(SubTask subTask);
-    SubTask getSubTaskById(int id);
-    List<SubTask> getAllSubTasks();
-    void deleteSubTaskById(Integer id);
-    void deleteAllSubTasks();
-    void checkEpicStatus(Epic epic);
+    void deleteTaskById(int idNumber);
+    void deleteEpicById(int idNumber);
+    void deleteSubtaskById(int idNumber);
+
+    ArrayList<Subtask> subtaskList(int idNumber);
     List<Task> getHistory();
-    HistoryManager getHistoryManager();
-    List<Task> getPrioritizedTasks();
+
+    Task creationTask(Task task);
+    Epic creationEpic(Epic epic);
+    Subtask creationSubtask(Subtask subtask);
+
+    Set<Task> getterPrioritizedTasks();
 }

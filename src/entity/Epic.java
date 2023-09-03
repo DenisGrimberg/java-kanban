@@ -1,88 +1,66 @@
 package entity;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
 
-    private final List<Integer> subTasksId;
-    private LocalDateTime endTime;
+    protected List<Integer> subtasks = new ArrayList<>();
 
-    public Epic(String name, TaskType taskType, String description) {
-        super(name, taskType, description, 0, LocalDateTime.MAX.toString());
-        this.endTime = LocalDateTime.MIN;
-        this.subTasksId = new ArrayList<>();
+    protected LocalDateTime endTime;
 
+    public Epic(String name, TaskStatus status, String description, LocalDateTime startTime,
+                long duration) {
+        super(name, status, description, startTime, duration);
+        this.taskType = TaskType.EPIC;
+        this.endTime = getEndTime();
     }
 
-    public Epic(String value) {
-        super(value);
-        if (startTime.isEqual(LocalDateTime.MAX)) {
-            this.endTime = LocalDateTime.MIN;
-        } else {
-            this.endTime = this.startTime.plus(duration);
-        }
-        this.subTasksId = new ArrayList<>();
-    }
-
-    public Epic(int id, String name, TaskType taskType, String description, TaskStatus status, List<Integer> epicSubTasks) {
-        super(name, taskType, description);
-        this.id = id;
-        this.status = status;
-        this.subTasksId = epicSubTasks;
-    }
-
-    public List<Integer> getSubTasksId() {
-        return subTasksId;
-    }
-
-    @Override
-    public TaskType getTaskType() {
-        return TaskType.EPIC;
-    }
-
-    @Override
-    public LocalDateTime getEndTime() {
-        return endTime;
+    public Epic(String name, TaskStatus status, String description, LocalDateTime startTime,
+                long duration, int id, List<Integer> subtasks) { // конструктор для обновления эпика
+        super(name, status, description, startTime, duration, id);
+        this.taskType = TaskType.EPIC;
+        this.subtasks = subtasks;
+        this.endTime = getEndTime();
     }
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 
-    public void plusDuration(Duration duration) {
-        this.duration = this.duration.plus(duration);
+    public void addIdOfSubtasks(Subtask subtask) {
+        subtasks.add(subtask.getId());
     }
 
-    public void minusDuration(Duration duration) {
-        this.duration = this.duration.minus(duration);
+    public List<Integer> getSubtasks() {
+        return subtasks;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Epic epic = (Epic) o;
-        return epic.name.equals(name) && epic.description.equals(description);
-    }
-
-    @Override
-    public int hashCode() {
-        int hashCode = super.hashCode();
-        hashCode += 31 * hashCode + name.hashCode() + description.hashCode() + id + status.hashCode() + subTasksId.hashCode();
-        return hashCode;
+    public void setSubtasks(ArrayList<Integer> subtasks) {
+        this.subtasks = subtasks;
     }
 
     @Override
     public String toString() {
-        return id + "," +
-                startTime.toString() + "," +
-                duration +
-                ",EPIC," +
-                name + "," +
-                status + "," +
-                description;
+        return "Epic{" +
+                "subtasks=" + subtasks +
+                ", id=" + id +
+                ", taskType=" + taskType +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                ", description='" + description + '\'' +
+                ", startTime=" + getStartTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) +
+                ", duration=" + duration +
+                ", endTime=" + getEndTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) +
+                '}';
+    }
+
+    @Override
+    public String getDescriptionTask() {
+        return getId() + "," + TaskType.EPIC + "," + getName() + "," + getStatus() + ","
+                + getDescription() + "," + getStartTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) +
+                "," + getDuration();
     }
 }
