@@ -2,9 +2,9 @@ id,type,name,status,description,startTime,duration,epic
 1,TASK,Task 1,NEW,Description Task 1,05.05.2000 10:20,10
 2,TASK,Task 2,NEW,Description Task 2,10.06.2000 11:25,50
 3,EPIC,Epic 1,IN_PROGRESS,Description Epic 1,11.01.2010 11:40,90
-4,EPIC,Epic 2,DONE,Description Epic 2,03.09.2023 21:26,40
+4,EPIC,Epic 2,DONE,Description Epic 2,05.09.2023 18:58,40
 8,EPIC,Epic 3,NEW,For test TaskStatus,20.02.2020 20:20,20
 5,SUBTASK,Subtask 1,NEW,Description Subtask 1,11.01.2010 11:40,50,3
-6,SUBTASK,Subtask 2,DONE,Description Subtask 2,03.09.2023 21:26,40,3
+6,SUBTASK,Subtask 2,DONE,Description Subtask 2,05.09.2023 18:58,40,3
 7,SUBTASK,Subtask 3,DONE,Description Subtask 3,14.06.2015 11:30,40,4
 

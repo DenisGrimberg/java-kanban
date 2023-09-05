@@ -516,9 +516,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
         expected.addAll(manager.getTasksList());
         expected.addAll(manager.getSubtaskList());
 
-        Set<Task> actual = manager.getterPrioritizedTasks();
 
-        assertEquals(expected, actual);
+        List<Task> actual = manager.getPrioritizedTasks();
+
+        List<Task> expectedList = new ArrayList<>(expected);
+
+
+        assertEquals(expectedList, actual);
 
         manager.deleteTasks();
         manager.deleteEpics();

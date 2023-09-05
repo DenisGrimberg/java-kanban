@@ -41,5 +41,5 @@ public interface TaskManager {
     Epic creationEpic(Epic epic);
     Subtask creationSubtask(Subtask subtask);
 
-    Set<Task> getterPrioritizedTasks();
+    List<Task> getPrioritizedTasks();
 }

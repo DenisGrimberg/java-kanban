@@ -155,7 +155,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 if (!history.isEmpty()) {
                     List<Integer> list = fromString(history);
                     for (Integer id : list) {
-                        manager.inMemoryHistoryManager.add(taskHashMap.get(id));
+                        manager.historyManager.add(taskHashMap.get(id));
                     }
                 }
             }
