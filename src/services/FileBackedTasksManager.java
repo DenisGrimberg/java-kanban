@@ -16,7 +16,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private static final String TOP_STRING = "id,type,name,status,description,startTime,duration,epic";
 
-    private final File file;
+    private File file;
 
     private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
@@ -25,7 +25,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    private void save() {
+    public FileBackedTasksManager() {}
+
+    public void save() {
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
 
@@ -169,21 +171,24 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void saveTask(Task task) {
-        super.saveTask(task);
+    public int saveTask(Task task) {
+        int id = super.saveTask(task);
         save();
+        return id;
     }
 
     @Override
-    public void saveEpic(Epic epic) {
-        super.saveEpic(epic);
+    public int saveEpic(Epic epic) {
+        int id = super.saveEpic(epic);
         save();
+        return id;
     }
 
     @Override
-    public void saveSubtask(Subtask subtask) {
-        super.saveSubtask(subtask);
+    public int saveSubtask(Subtask subtask) {
+        int id = super.saveSubtask(subtask);
         save();
+        return id;
     }
 
     @Override
@@ -247,38 +252,44 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateTask(Task task) {
-        super.updateTask(task);
+    public int updateTask(Task task) {
+        int id = super.updateTask(task);
         save();
+        return id;
     }
 
     @Override
-    public void updateEpic(Epic epic) {
-        super.updateEpic(epic);
+    public int updateEpic(Epic epic) {
+        int id = super.updateEpic(epic);
         save();
+        return id;
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
-        super.updateSubtask(subtask);
+    public int updateSubtask(Subtask subtask) {
+        int id = super.updateSubtask(subtask);
         save();
+        return id;
     }
 
     @Override
-    public void deleteTaskById(int idNumber) {
-        super.deleteTaskById(idNumber);
+    public Task deleteTaskById(int idNumber) {
+        Task task = super.deleteTaskById(idNumber);
         save();
+        return task;
     }
 
     @Override
-    public void deleteEpicById(int idNumber) {
-        super.deleteEpicById(idNumber);
+    public Epic deleteEpicById(int idNumber) {
+        Epic epic = super.deleteEpicById(idNumber);
         save();
+        return epic;
     }
 
     @Override
-    public void deleteSubtaskById(int idNumber) {
-        super.deleteSubtaskById(idNumber);
+    public Subtask deleteSubtaskById(int idNumber) {
+        Subtask subtask = super.deleteSubtaskById(idNumber);
         save();
+        return subtask;
     }
 }

@@ -1,12 +1,10 @@
-import entity.Epic;
-import entity.Subtask;
-import entity.Task;
-import entity.TaskStatus;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import services.HistoryManager;
 import services.InMemoryHistoryManager;
 import services.TaskManager;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import entity.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,9 +12,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static entity.TaskStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static entity.TaskStatus.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
     public T manager;
@@ -38,49 +35,53 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         manager = createTaskManager();
 
-        firstTask = manager.creationTask(new Task("Task 1", NEW,
-                "Description Task 1", LocalDateTime.of(2000, 5, 5, 10, 20),
-                10));
+        firstTask = new Task("Таск 1", NEW,
+                "Описание Таск 1", LocalDateTime.of(2000, 5, 5, 10, 20),
+                10);
+
+        secondTask = new Task("Таск 2", NEW,
+                "Описание Таск 2", LocalDateTime.of(2000, 6, 10, 11, 25),
+                50);
+
+        firstEpic = new Epic("Эпик 1", TaskStatus.NEW,
+                "Описание Эпик 1", LocalDateTime.of(2001, 9, 11, 10, 20),
+                10);
+
+        secondEpic = new Epic("Эпик 2", TaskStatus.NEW,
+                "Описание Эпик 2", LocalDateTime.now().minusMinutes(30), 20);
+
+        firstSubtask = new Subtask("Сабтаск 1", NEW,
+                "Описание Сабтаск 1", LocalDateTime.of(2010, 1, 11, 11, 40),
+                50, 3);
+
+        secondSubtask = new Subtask("Сабтаск 2",
+                TaskStatus.DONE, "Описание Сабтаск 2", LocalDateTime.now().minusMinutes(30), 40,
+                3);
+
+        thirdSubtask = new Subtask("Сабтаск 3",
+                TaskStatus.DONE, "Описание Сабтаск 3",
+                LocalDateTime.of(2015, 6, 14, 11, 30), 40, 4);
+
+        thirdEpic = new Epic("Эпик 3", NEW,
+                "Для теста статусов", LocalDateTime.of(2020, 2, 20, 20, 20),
+                20);
+    }
+
+    void saveTasks(){
         manager.saveTask(firstTask);
-
-        secondTask = manager.creationTask(new Task("Task 2", NEW,
-                "Description Task 2", LocalDateTime.of(2000, 6, 10, 11, 25),
-                50));
         manager.saveTask(secondTask);
-
-        firstEpic = manager.creationEpic(new Epic("Epic 1", TaskStatus.NEW,
-                "Description Epic 1", LocalDateTime.of(2001, 9, 11, 10, 20),
-                10));
         manager.saveEpic(firstEpic);
-
-        secondEpic = manager.creationEpic(new Epic("Epic 2", TaskStatus.NEW,
-                "Description Epic 2", LocalDateTime.now().minusMinutes(30), 20));
         manager.saveEpic(secondEpic);
-
-        firstSubtask = manager.creationSubtask(new Subtask("Subtask 1", NEW,
-                "Description Subtask 1", LocalDateTime.of(2010, 1, 11, 11, 40),
-                50, 3));
         manager.saveSubtask(firstSubtask);
-
-        secondSubtask = manager.creationSubtask(new Subtask("Subtask 2",
-                DONE, "Description Subtask 2", LocalDateTime.now().minusMinutes(30), 40,
-                3));
         manager.saveSubtask(secondSubtask);
-
-        thirdSubtask = manager.creationSubtask(new Subtask("Subtask 3",
-                DONE, "Description Subtask 3",
-                LocalDateTime.of(2015, 6, 14, 11, 30), 40, 4));
         manager.saveSubtask(thirdSubtask);
-
-        thirdEpic = manager.creationEpic(new Epic("Epic 3", NEW,
-                "For test TaskStatus", LocalDateTime.of(2020, 2, 20, 20, 20),
-                20));
         manager.saveEpic(thirdEpic);
     }
 
     @Test
     void testSaveTask() {
 
+        saveTasks();
         assertEquals(manager.getTaskByIdNumber(1).getName(), firstTask.getName());
         assertEquals(manager.getTaskByIdNumber(1).getTaskType(), firstTask.getTaskType());
         assertEquals(manager.getTaskByIdNumber(1).getStatus(), firstTask.getStatus());
@@ -95,6 +96,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testSaveEpic() {
 
+        saveTasks();
         assertEquals(manager.getEpicTaskByIdNumber(3).getName(), firstEpic.getName());
         assertEquals(manager.getEpicTaskByIdNumber(3).getTaskType(), firstEpic.getTaskType());
         assertEquals(manager.getEpicTaskByIdNumber(3).getStatus(), firstEpic.getStatus());
@@ -109,6 +111,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testSaveSubtask() {
 
+        saveTasks();
         assertEquals(manager.getSubTaskByIdNumber(5).getName(), firstSubtask.getName());
         assertEquals(manager.getSubTaskByIdNumber(5).getTaskType(), firstSubtask.getTaskType());
         assertEquals(manager.getSubTaskByIdNumber(5).getStatus(), firstSubtask.getStatus());
@@ -118,8 +121,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         assertEquals(manager.getEpicTaskByIdNumber(3).getId(), firstSubtask.getEpicID());
 
-        Subtask testSubtask = new Subtask("Subtask ", NEW,
-                "Description Subtask ", LocalDateTime.of(2020, 2, 20, 20, 20),
+        Subtask testSubtask = new Subtask("Саб таск ", NEW,
+                "Описание Саб таск ", LocalDateTime.of(2020, 2, 20, 20, 20),
                 50, 8);
         manager.saveSubtask(testSubtask);
         assertEquals(manager.getEpicTaskByIdNumber(8).getStatus(), testSubtask.getStatus());
@@ -133,6 +136,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testGetTasksList() {
 
+        saveTasks();
         List<Task> testList1 = new ArrayList<>(List.of(firstTask, secondTask));
         List<Task> testList2 = manager.getTasksList();
         assertEquals(testList1, testList2);
@@ -144,6 +148,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testGetEpicsList() {
 
+        saveTasks();
         List<Epic> testList1 = new ArrayList<>(List.of(firstEpic, secondEpic, thirdEpic));
         List<Epic> testList2 = manager.getEpicsList();
         assertEquals(testList1, testList2);
@@ -155,6 +160,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testGetSubtaskList() {
 
+        saveTasks();
         List<Subtask> testList1 = new ArrayList<>(List.of(firstSubtask, secondSubtask, thirdSubtask));
         List<Subtask> testList2 = manager.getSubtaskList();
         assertEquals(testList1, testList2);
@@ -166,6 +172,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testDeleteTasks() {
 
+        saveTasks();
         manager.deleteTasks();
         List<Task> testList = manager.getTasksList();
         assertEquals(0, testList.size());
@@ -176,6 +183,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testDeleteEpics() {
 
+        saveTasks();
         manager.deleteEpics();
         List<Epic> testList = manager.getEpicsList();
         assertEquals(0, testList.size());
@@ -186,6 +194,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testDeleteSubtasks() {
 
+        saveTasks();
         manager.deleteSubtasks();
         List<Subtask> testList = manager.getSubtaskList();
         assertEquals(0, testList.size());
@@ -198,7 +207,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testGetTaskByIdNumber() {
-
+        saveTasks();
         assertNull(manager.getTaskByIdNumber(10));
 
         assertEquals(manager.getTaskByIdNumber(2).getName(), secondTask.getName());
@@ -214,7 +223,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testGetEpicTaskByIdNumber() {
-
+        saveTasks();
         assertNull(manager.getEpicTaskByIdNumber(10));
 
         assertEquals(manager.getEpicTaskByIdNumber(4).getName(), secondEpic.getName());
@@ -230,7 +239,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testGetSubTaskByIdNumber() {
-
+        saveTasks();
         assertNull(manager.getSubTaskByIdNumber(10));
 
         assertEquals(manager.getSubTaskByIdNumber(6).getName(), secondSubtask.getName());
@@ -246,9 +255,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testCreationTask() {
-
-        Task testTask = new Task("Task 1", NEW,
-                "Description Task 1", LocalDateTime.of(2000, 5, 5, 10, 20),
+        saveTasks();
+        Task testTask = new Task("Таск 1", NEW,
+                "Описание Таск 1", LocalDateTime.of(2000, 5, 5, 10, 20),
                 10, 1);
         manager.creationTask(testTask);
         assertEquals(manager.getTaskByIdNumber(1).getId(), testTask.getId());
@@ -265,9 +274,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testCreationEpic() {
-
-        Epic testEpic = new Epic("Epic 1", IN_PROGRESS,
-                "Description Epic 1", LocalDateTime.of(2010, 1, 11, 11, 40),
+        saveTasks();
+        Epic testEpic = new Epic("Эпик 1", IN_PROGRESS,
+                "Описание Эпик 1", LocalDateTime.of(2010, 1, 11, 11, 40),
                 90);
         manager.creationEpic(testEpic);
         assertEquals(manager.getEpicTaskByIdNumber(3).getName(), testEpic.getName());
@@ -283,9 +292,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testCreationSubtask() {
-
-        Subtask testSubtask = new Subtask("Subtask 1", NEW,
-                "Description Subtask 1", LocalDateTime.of(2010, 1, 11, 11, 40),
+        saveTasks();
+        Subtask testSubtask = new Subtask("Сабтаск 1", NEW,
+                "Описание Сабтаск 1", LocalDateTime.of(2010, 1, 11, 11, 40),
                 50, 3);
         manager.creationSubtask(testSubtask);
         assertEquals(manager.getSubTaskByIdNumber(5).getName(), testSubtask.getName());
@@ -295,8 +304,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(manager.getSubTaskByIdNumber(5).getStartTime(), testSubtask.getStartTime());
         assertEquals(manager.getSubTaskByIdNumber(5).getDuration(), testSubtask.getDuration());
 
-        Subtask testSubtask1 = new Subtask("Subtask ", NEW,
-                "Description Subtask ", LocalDateTime.of(2020, 2, 20, 20, 20),
+        Subtask testSubtask1 = new Subtask("Саб таск ", NEW,
+                "Описание Саб таск ", LocalDateTime.of(2020, 2, 20, 20, 20),
                 50, 8);
         manager.saveSubtask(testSubtask1);
         assertEquals(manager.getEpicTaskByIdNumber(8).getStatus(), testSubtask1.getStatus());
@@ -309,9 +318,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testUpdateTask() {
-
-        Task testTask = new Task("Task 1", NEW,
-                "Description Task 1", LocalDateTime.of(2000, 5, 5, 10, 20),
+        saveTasks();
+        Task testTask = new Task("Таск 1", NEW,
+                "Описание Таск 1", LocalDateTime.of(2000, 5, 5, 10, 20),
                 10L, 1);
         manager.updateTask(testTask);
         assertEquals(manager.getTaskByIdNumber(1).getId(), testTask.getId());
@@ -328,10 +337,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testUpdateEpic() {
-
+        saveTasks();
         List<Integer> list = new ArrayList<>();
-        Epic testEpic = new Epic("Epic 1", IN_PROGRESS,
-                "Description Epic 1", LocalDateTime.of(2010, 1, 11, 11, 40),
+        Epic testEpic = new Epic("Эпик 1", IN_PROGRESS,
+                "Описание Эпик 1", LocalDateTime.of(2010, 1, 11, 11, 40),
                 90, 3, list);
         manager.updateEpic(testEpic);
         assertEquals(manager.getEpicTaskByIdNumber(3).getName(), testEpic.getName());
@@ -347,17 +356,17 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testUpdateSubtask() {
-
-        Subtask testSubtask = new Subtask("Subtask 1", DONE,
-                "Description Subtask 1", LocalDateTime.of(2010, 1, 11, 11, 40),
+        saveTasks();
+        Subtask testSubtask = new Subtask("Сабтаск 1", DONE,
+                "Описание Сабтаск 1", LocalDateTime.of(2010, 1, 11, 11, 40),
                 50, 3);
         manager.updateSubtask(testSubtask);
         assertEquals(manager.getSubTaskByIdNumber(5).getName(), testSubtask.getName());
         assertEquals(manager.getSubTaskByIdNumber(5).getTaskType(), testSubtask.getTaskType());
         assertEquals(manager.getSubTaskByIdNumber(5).getDescription(), testSubtask.getDescription());
 
-        Subtask testSubtask1 = new Subtask("Subtask", NEW,
-                "Description Subtask", LocalDateTime.of(2020, 2, 20, 20, 20),
+        Subtask testSubtask1 = new Subtask("Саб таск ", NEW,
+                "Описание Саб таск ", LocalDateTime.of(2020, 2, 20, 20, 20),
                 50, 8);
         manager.saveSubtask(testSubtask1);
         assertEquals(manager.getEpicTaskByIdNumber(8).getStatus(), testSubtask1.getStatus());
@@ -370,7 +379,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testDeleteTaskById() {
-
+        saveTasks();
         manager.deleteTaskById(10);
         assertEquals(2, manager.getTasksList().size());
 
@@ -383,7 +392,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testDeleteEpicById() {
-
+        saveTasks();
         manager.deleteEpicById(10);
         assertEquals(3, manager.getEpicsList().size());
 
@@ -395,6 +404,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testDeleteSubtaskById() {
+        saveTasks();
 
         manager.deleteSubtaskById(10);
         assertEquals(3, manager.getSubtaskList().size());
@@ -412,7 +422,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testSubtaskList() {
-
+        saveTasks();
         assertNull(manager.getEpicTaskByIdNumber(10));
 
         assertEquals(firstEpic.getId(), firstSubtask.getEpicID());
@@ -424,14 +434,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testChangeEpicStatusAllSubtaskStatusNew() {
-
-        Subtask sub1 = manager.creationSubtask(new Subtask("Subtask 1",
-                NEW, "Description Subtask 1",
+        saveTasks();
+        Subtask sub1 = manager.creationSubtask(new Subtask("Саб 1",
+                NEW, "Описание Саб 1",
                 LocalDateTime.of(2017, 7, 18, 11, 30), 40, 8));
         manager.saveSubtask(sub1);
 
-        Subtask sub2 = manager.creationSubtask(new Subtask("Subtask 2",
-                NEW, "Description Subtask 2",
+        Subtask sub2 = manager.creationSubtask(new Subtask("Саб 2",
+                NEW, "Описание Саб 2",
                 LocalDateTime.of(2016, 7, 18, 11, 30), 40, 8));
         manager.saveSubtask(sub2);
 
@@ -443,19 +453,18 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testChangeEpicStatusAllSubtaskStatusDone() {
-
-        Subtask sub1 = manager.creationSubtask(new Subtask("Subtask 1",
-                DONE, "Description Subtask 1",
+        saveTasks();
+        Subtask sub1 = manager.creationSubtask(new Subtask("Саб 1",
+                DONE, "Описание Саб 1",
                 LocalDateTime.of(2017, 7, 18, 11, 30), 40, 8));
         manager.saveSubtask(sub1);
 
-        Subtask sub2 = manager.creationSubtask(new Subtask("Subtask 2",
-                DONE, "Description Subtask 2",
+        Subtask sub2 = manager.creationSubtask(new Subtask("Саб 2",
+                DONE, "Описание Саб 2",
                 LocalDateTime.of(2016, 7, 18, 11, 30), 40, 8));
         manager.saveSubtask(sub2);
 
         assertEquals(DONE, manager.getEpicTaskByIdNumber(8).getStatus());
-
 
         manager.deleteSubtasks();
         assertEquals(0, manager.getSubtaskList().size());
@@ -463,14 +472,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testChangeEpicStatusSubtaskStatusDoneNew() {
-
-        Subtask sub1 = manager.creationSubtask(new Subtask("Subtask 1",
-                DONE, "Description Subtask 1",
+        saveTasks();
+        Subtask sub1 = manager.creationSubtask(new Subtask("Саб 1",
+                DONE, "Описание Саб 1",
                 LocalDateTime.of(2017, 7, 18, 11, 30), 40, 8));
         manager.saveSubtask(sub1);
 
-        Subtask sub2 = manager.creationSubtask(new Subtask("Subtask 2",
-                NEW, "Description Subtask 2",
+        Subtask sub2 = manager.creationSubtask(new Subtask("Саб 2",
+                NEW, "Описание Саб 2",
                 LocalDateTime.of(2016, 7, 18, 11, 30), 40, 8));
         manager.saveSubtask(sub2);
 
@@ -482,14 +491,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testChangeEpicStatusAllSubtaskStatusInProgress() {
-
-        Subtask sub1 = manager.creationSubtask(new Subtask("Subtask 1",
-                IN_PROGRESS, "Description Subtask 1",
+        saveTasks();
+        Subtask sub1 = manager.creationSubtask(new Subtask("Саб 1",
+                IN_PROGRESS, "Описание Саб 1",
                 LocalDateTime.of(2017, 7, 18, 11, 30), 40, 8));
         manager.saveSubtask(sub1);
 
-        Subtask sub2 = manager.creationSubtask(new Subtask("Subtask 2",
-                IN_PROGRESS, "Description Subtask 2",
+        Subtask sub2 = manager.creationSubtask(new Subtask("Саб 2",
+                IN_PROGRESS, "Описание Саб 2",
                 LocalDateTime.of(2016, 7, 18, 11, 30), 40, 8));
         manager.saveSubtask(sub2);
 
@@ -501,7 +510,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testGetPrioritizedTasks() {
-
+        saveTasks();
         Set<Task> expected = new TreeSet<>((o1, o2) -> {
             if ((o1.getStartTime() != null) && (o2.getStartTime() != null)) {
                 return o1.getStartTime().compareTo(o2.getStartTime());
@@ -516,13 +525,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
         expected.addAll(manager.getTasksList());
         expected.addAll(manager.getSubtaskList());
 
+        Set<Task> actual = manager.getPrioritizedTasks();
 
-        List<Task> actual = manager.getPrioritizedTasks();
-
-        List<Task> expectedList = new ArrayList<>(expected);
-
-
-        assertEquals(expectedList, actual);
+        assertEquals(expected, actual);
 
         manager.deleteTasks();
         manager.deleteEpics();
@@ -534,7 +539,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testGetHistory() {
-
+        saveTasks();
         historyManager = new InMemoryHistoryManager();
 
         assertTrue(historyManager.getHistory().isEmpty());

@@ -10,9 +10,9 @@ import java.util.Set;
 
 public interface TaskManager {
 
-    void saveTask(Task task);
-    void saveEpic(Epic epic);
-    void saveSubtask(Subtask subtask);
+    int saveTask(Task task);
+    int saveEpic(Epic epic);
+    int saveSubtask(Subtask subtask);
 
     ArrayList<Task> getTasksList();
     ArrayList<Epic> getEpicsList();
@@ -26,13 +26,13 @@ public interface TaskManager {
     Epic getEpicTaskByIdNumber(int idNumber);
     Subtask getSubTaskByIdNumber(int idNumber);
 
-    void updateTask(Task task);
-    void updateEpic(Epic epic);
-    void updateSubtask(Subtask subtask);
+    int updateTask(Task task);
+    int updateEpic(Epic epic);
+    int updateSubtask(Subtask subtask);
 
-    void deleteTaskById(int idNumber);
-    void deleteEpicById(int idNumber);
-    void deleteSubtaskById(int idNumber);
+    Task deleteTaskById(int idNumber);
+    Epic deleteEpicById(int idNumber);
+    Subtask deleteSubtaskById(int idNumber);
 
     ArrayList<Subtask> subtaskList(int idNumber);
     List<Task> getHistory();
@@ -41,5 +41,5 @@ public interface TaskManager {
     Epic creationEpic(Epic epic);
     Subtask creationSubtask(Subtask subtask);
 
-    List<Task> getPrioritizedTasks();
+    Set<Task> getPrioritizedTasks();
 }
