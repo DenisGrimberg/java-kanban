@@ -1,5 +1,7 @@
 package servers;
 
+import exception.TaskClientException;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -27,10 +29,10 @@ public class KVTaskClient {
             response = client.send(request, handler);
 
             if (response.statusCode() != 200) {
-                throw new RuntimeException();
+                throw new TaskClientException();
             }
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException();
+            throw new TaskClientException();
         }
         API_TOKEN = response.body();
     }
@@ -44,10 +46,10 @@ public class KVTaskClient {
             response = client.send(request, handler);
             System.out.println(response.statusCode());
             if (response.statusCode() != 200) {
-                throw new RuntimeException();
+                throw new TaskClientException();
             }
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException();
+            throw new TaskClientException();
         }
     }
 
@@ -59,10 +61,10 @@ public class KVTaskClient {
         try {
             response = client.send(request, handler);
             if (response.statusCode() != 200) {
-                throw new RuntimeException();
+                throw new TaskClientException();
             }
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException();
+            throw new TaskClientException();
         }
         return response.body();
     }

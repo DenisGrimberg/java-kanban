@@ -36,7 +36,8 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
         manager.deleteEpics();
         manager.deleteSubtasks();
 
-        HttpTaskManager emptyManager = HttpTaskManager.load("http://localhost:8078", "key");
+        HttpTaskManager emptyManager = new HttpTaskManager("http://localhost:8078", "key");
+        emptyManager.load();
 
         assertEquals(0, emptyManager.getTasksList().size());
         assertEquals(0, emptyManager.getSubtaskList().size());
@@ -54,7 +55,8 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
         manager.getEpicTaskByIdNumber(3);
         manager.getEpicTaskByIdNumber(4);
 
-        HttpTaskManager oneEpicManager = HttpTaskManager.load("http://localhost:8078", "key");
+        HttpTaskManager oneEpicManager = new HttpTaskManager("http://localhost:8078", "key");
+        oneEpicManager.load();
 
         assertEquals(3, oneEpicManager.getEpicsList().size());
         assertEquals(2, oneEpicManager.getHistory().size());
@@ -66,7 +68,8 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
 
         saveTasks();
 
-        HttpTaskManager emptyHistoryManager = HttpTaskManager.load("http://localhost:8078", "key");
+        HttpTaskManager emptyHistoryManager = new HttpTaskManager("http://localhost:8078", "key");
+        emptyHistoryManager.load();
 
         assertEquals(2, emptyHistoryManager.getTasksList().size());
         assertEquals(3, emptyHistoryManager.getEpicsList().size());
